@@ -151,6 +151,10 @@ Create DNS record automatically:
 cloudflared tunnel route dns my-tunnel app.example.com
 ```
 
+```bash
+cloudflared tunnel route dns my-tunnel app2.example.com
+```
+
 Now visiting `https://app.example.com` will route through Cloudflare Tunnel → your device.
 
 ---
