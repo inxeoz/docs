@@ -1,11 +1,11 @@
 ---
 title: Virtual Machine Archlinux
-date: 2025-11-18
+date: 2025-11-20T16:01:16Z
+lastmod: 2025-11-20T16:01:16Z
 description: Complete Arch Linux KVM installation guide
 permalink: posts/{{ title | slug }}/index.html
 tags: [kvm, archlinux, virtualization]
 ---
-
 
 # Quick prerequisites — check your hardware
 
@@ -170,5 +170,3 @@ sudo pacman -S virtualbox virtualbox-host-dkms linux-headers
 ```
 
 Then enable the systemd service that VirtualBox provides (if any), add your user to `vboxusers` group, and use the VirtualBox GUI. Note: VirtualBox and KVM/QEMU can conflict if they try to use the same low-level virtualization features — pick one primary hypervisor. (VirtualBox is fine for casual desktop use but KVM is higher performance for Linux hosts.)
-
-

@@ -1,5 +1,12 @@
-Here is the **final polished article**, now including a clean, complete **“How to Remove Wildcard Domain Resolution”** section.
+---
+title: "How to Safely Set Up Wildcard Domain Resolution on Linux Without Breaking Your System"
+date: 2025-12-09T20:27:27Z
+lastmod: 2025-12-09T20:27:27Z
+---
+
+Here is the **final polished article**, now including a clean, complete **"How to Remove Wildcard Domain Resolution"** section.
 This version is publication-ready.
+
 
 ---
 

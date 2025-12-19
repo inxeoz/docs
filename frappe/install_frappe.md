@@ -1,3 +1,10 @@
+---
+title: "How to Install Frappe Bench on Arch Linux"
+date: 2025-11-19T07:53:10Z
+lastmod: 2025-11-25T07:18:46Z
+---
+
+
 
 
 # How to Install Frappe Bench on Arch Linux
@@ -21,6 +28,7 @@ sudo pacman -S \
     cronie \
     base-devel gcc cmake make
 ```
+
 
 
 
@@ -109,6 +117,7 @@ bench --version
 
 
 
+
 # 🏗️ 6. Initialize a New Bench
 
 Create your bench environment:
@@ -184,4 +193,3 @@ http://localhost:8000
 ```
 
 ------
-

@@ -1,6 +1,7 @@
 ---
 title: KVM and Hosting
-date: 2025-11-18
+date: 2025-11-20T16:01:16Z
+lastmod: 2025-11-20T16:01:16Z
 description: KVM networking and local repository setup
 permalink: posts/{{ title | slug }}/index.html
 tags: [kvm, virtualization, networking]

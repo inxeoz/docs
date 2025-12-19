@@ -1,11 +1,11 @@
 ---
-title: Python By Projects
-date: 2025-11-18
+title: Learn Python By Projects
+date: 2025-11-20T16:01:16Z
+lastmod: 2025-11-20T16:01:16Z
+description: Learn Python through hands-on projects from beginner to advanced
 permalink: posts/{{ title | slug }}/index.html
+tags: [python, learning, projects]
 ---
-
-
-
 
 # ✅ **LEVEL 0 — ABSOLUTE BEGINNER (Basics)**
 
@@ -273,5 +273,3 @@ Distributed tasks, async IO, concurrency, Docker.
 Scraping, automation, dashboards, ML integration.
 
 ---
-
-

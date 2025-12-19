@@ -1,16 +1,11 @@
-
 ---
+date: 2025-11-22T11:00:59Z
+lastmod: 2025-11-22T14:33:24Z
 title: react-native
-date: 2025-11-22
 permalink: posts/{{ title | slug }}/index.html
 tags: [react-native, android, mobile]
 ---
 
-
-
-
-
----
 
 # 🐧 **How to Run React Native on Arch Linux (and Fix Common Errors)**
 

@@ -1,3 +1,12 @@
+---
+title: *.test
+date: 2025-12-10T18:13:33Z
+lastmod: 2025-12-10T18:13:33Z
+description: Setting up local *.test DNS resolution without breaking system DNS
+permalink: posts/{{ title | slug }}/index.html
+tags: [dns, networking, systemd]
+---
+
 # Setting Up Local *.test DNS Resolution Without Breaking System DNS
 
 ## Introduction

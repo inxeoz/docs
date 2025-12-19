@@ -1,6 +1,7 @@
 ---
 title: Redis Setup
-date: 2025-11-18
+date: 2025-11-20T16:01:16Z
+lastmod: 2025-11-20T16:01:16Z
 description: Redis troubleshooting for Frappe
 permalink: posts/{{ title | slug }}/index.html
 tags: [redis, frappe, troubleshooting]
