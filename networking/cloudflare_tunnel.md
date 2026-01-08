@@ -1,7 +1,6 @@
 ---
 title: Cloudflare Tunnel
-date: 2025-11-20T16:01:16Z
-lastmod: 2025-12-02T14:30:38Z
+date: 2025-12-20T01:07:08+05:30
 description: Complete Cloudflare Tunnel setup and troubleshooting
 permalink: posts/{{ title | slug }}/index.html
 tags: [cloudflare, tunnel, networking]

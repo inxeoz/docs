@@ -1,7 +1,6 @@
 ---
 title: Redis
-date: 2025-11-27T14:35:53Z
-lastmod: 2025-11-27T14:35:53Z
+date: 2025-12-20T01:07:08+05:30
 description: Checking Valkey (Redis) port on Arch Linux
 permalink: posts/{{ title | slug }}/index.html
 tags: [redis, valkey, archlinux]

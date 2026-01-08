@@ -1,7 +1,6 @@
 ---
-title: dnstest
-date: 2025-12-10T18:13:33Z
-lastmod: 2025-12-10T18:13:33Z
+title: DNS Test
+date: 2025-12-20T01:08:12+05:30
 description: Setting up local *.test DNS resolution without breaking system DNS
 permalink: posts/{{ title | slug }}/index.html
 tags: [dns, networking, systemd]

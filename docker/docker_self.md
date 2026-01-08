@@ -1,7 +1,6 @@
 ---
 title: Docker Self
-date: 2025-11-20T16:01:16Z
-lastmod: 2025-11-20T16:01:16Z
+date: 2025-12-20T01:07:08+05:30
 description: Advanced Docker system management
 permalink: posts/{{ title | slug }}/index.html
 tags: [docker, system, management]
