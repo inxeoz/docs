@@ -1,14 +1,17 @@
-## add these types of details to blog content
+1.run git command "git log -1 --format="%ad" -- filename " to find updated date for that file
+1.1 find all the updated dates for all posts/content (.md files)
+
+2. if md file missing basic header section then add header section 
 
 ```
 ---
-title: Cloudflare Tunnel
-date: 2025-11-18
-description: Complete Cloudflare Tunnel setup and troubleshooting
+title: file_name_or_concluded_title_from_content
+date: recent_updated_date
+description: infer from content
 permalink: posts/{{ title | slug }}/index.html
-tags: [cloudflare, tunnel, networking]
+tags: [tag1, tag2, tag2] 
 ---
 ```
+3. infer tags, description , title from conten md file for which details will being update
 
-
-
+4. if md file has header section then update date to update_date
