@@ -1,9 +1,10 @@
 ---
 title: Cloudflare Tunnel
-date: 2026-01-09
+date: 2026-01-20
 description: Complete Cloudflare Tunnel setup and troubleshooting
 permalink: posts/{{ title | slug }}/index.html
 tags: [cloudflare, tunnel, networking]
+categories: ['networking']
 ---
 
 

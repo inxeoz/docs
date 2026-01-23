@@ -1,10 +1,11 @@
 
 ---
 title: CI/CD for Frappe Bench using Jenkins
-date: 2026-01-09
+date: 2026-01-20
 description: Safe CI/CD with rollback for Frappe Bench applications using Docker and Jenkins in offline environments
 permalink: posts/{{ title | slug }}/index.html
 tags: [frappe, cicd, jenkins, docker, offline]
+categories: ['frappe']
 ---
 
 # CI/CD for Frappe Bench using Jenkins (Offline / Air-Gapped Setup)

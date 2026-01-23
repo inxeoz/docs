@@ -1,10 +1,11 @@
 
 ---
 title: Running Frappe ERPNext Docker Deployments Fully Offline
-date: 2026-01-09
+date: 2026-01-20
 description: Building, exporting, loading, and serving Docker images without internet for offline deployment
 permalink: posts/{{ title | slug }}/index.html
 tags: [frappe, docker, offline, deployment, air-gapped]
+categories: ['frappe']
 ---
 
 # Running Frappe / ERPNext Docker Deployments Fully Offline

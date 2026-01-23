@@ -1,9 +1,10 @@
 ---
 title: DNS Test
-date: 2026-01-09
+date: 2026-01-20
 description: Setting up local *.test DNS resolution without breaking system DNS
 permalink: posts/{{ title | slug }}/index.html
 tags: [dns, networking, systemd]
+categories: ['networking']
 ---
 
 # Setting Up Local *.test DNS Resolution Without Breaking System DNS

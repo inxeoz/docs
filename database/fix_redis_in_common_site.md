@@ -1,9 +1,10 @@
 ---
 title: Fix Redis In Common Site
-date: 2026-01-09
+date: 2026-01-20
 description: Redis configuration for Frappe
 permalink: posts/{{ title | slug }}/index.html
 tags: [redis, frappe, configuration]
+categories: ['database']
 ---
 
 "redis_cache": "redis://redis-cache:6379",

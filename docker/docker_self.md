@@ -1,9 +1,10 @@
 ---
 title: Docker Self
-date: 2026-01-09
+date: 2026-01-20
 description: Advanced Docker system management
 permalink: posts/{{ title | slug }}/index.html
 tags: [docker, system, management]
+categories: ['docker']
 ---
 
 
