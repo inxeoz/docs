@@ -17,14 +17,6 @@ categories:
 - frappe
 ---
 
----
-title: Fixing ERPNext Frappe Database Access Denied Error
-date: 2026-01-21
-description: Troubleshooting and fixing pymysql operational access denied errors in Frappe ERPNext
-permalink: posts/{{ title | slug }}/index.html
-tags: [frappe, erpnext, database, troubleshooting, mysql]
-categories: ['frappe']
----
 
 # Fixing ERPNext / Frappe Error
 

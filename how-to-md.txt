@@ -22,3 +22,8 @@ categories: cat_name
 6. use max 12 character for category name
 
 7. use parent folder name as category name of markdown content
+
+8. there should not be duplicate header
+
+9. number of tag(tags) should be less then equal to 5
+

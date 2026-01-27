@@ -13,14 +13,6 @@ categories:
 - rhel
 ---
 
----
-title: Run RHEL 9 in Docker Offline-Friendly
-date: 2026-01-13
-description: Use RHEL 9 in Docker, save packages to your computer, and install them offline
-permalink: posts/{{ title | slug }}/index.html
-tags: [rhel, docker, offline, packages, rpm]
-categories: ['rhel']
----
 
 # 🐳 Run RHEL 9 in Docker (Offline-Friendly)  
   

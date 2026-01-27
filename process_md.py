@@ -149,6 +149,51 @@ def infer_metadata_from_content(content, filepath):
     return title, description, tags_list, categories
 
 
+def has_duplicate_headers(content):
+    """Check if content has duplicate YAML headers (not counting horizontal rules)."""
+    lines = content.split("\n")
+    yaml_headers = []
+    i = 0
+
+    while i < len(lines):
+        line = lines[i].strip()
+        if line == "---":
+            # Check if this is a header block (has YAML-like content after it)
+            if i + 1 < len(lines):
+                next_line = lines[i + 1].strip()
+                # If next line looks like YAML (contains colons, title, date, etc.)
+                if any(
+                    key in next_line.lower()
+                    for key in [
+                        "title:",
+                        "date:",
+                        "description:",
+                        "tags:",
+                        "categories:",
+                        "permalink:",
+                    ]
+                ):
+                    # This is a YAML header
+                    yaml_headers.append(i)
+                    # Skip to find its end
+                    j = i + 1
+                    while j < len(lines) and lines[j].strip() != "---":
+                        j += 1
+                    if j < len(lines):
+                        yaml_headers.append(j)  # End of header
+                    i = j + 1
+                else:
+                    # This is likely a horizontal rule, skip it
+                    i += 1
+            else:
+                i += 1
+        else:
+            i += 1
+
+    # Return True if more than one complete header found
+    return len(yaml_headers) > 2
+
+
 def parse_existing_header(content):
     """Parse existing YAML header if present."""
     if not content.startswith("---"):
@@ -205,6 +250,71 @@ def process_markdown_file(filepath):
     except Exception as e:
         print(f"  Error reading file: {e}")
         return False
+
+    # Check for duplicate headers
+    if has_duplicate_headers(content):
+        print(f"  Warning: Found duplicate headers in {filepath}")
+        # Remove duplicate headers, keep only the first one
+        lines = content.split("\n")
+        new_lines = []
+        header_found = False
+        i = 0
+
+        while i < len(lines):
+            line = lines[i]
+            if line.strip() == "---" and not header_found:
+                # First header - keep it
+                new_lines.append(line)
+                i += 1
+                # Find end of first header
+                while i < len(lines) and lines[i].strip() != "---":
+                    new_lines.append(lines[i])
+                    i += 1
+                if i < len(lines):
+                    new_lines.append(lines[i])  # Add closing ---
+                i += 1
+                header_found = True
+            elif line.strip() == "---" and header_found:
+                # Potential duplicate header - check if it's really a header
+                if i + 1 < len(lines):
+                    next_line = lines[i + 1].strip()
+                    if any(
+                        key in next_line.lower()
+                        for key in [
+                            "title:",
+                            "date:",
+                            "description:",
+                            "tags:",
+                            "categories:",
+                            "permalink:",
+                        ]
+                    ):
+                        # This is a duplicate header, skip it
+                        print(f"  Removing duplicate header starting at line {i + 1}")
+                        i += 1
+                        # Skip until the end of this duplicate header
+                        while i < len(lines) and lines[i].strip() != "---":
+                            i += 1
+                        if i < len(lines):
+                            i += 1  # Skip the closing ---
+                        continue
+                # Not a duplicate header, keep it as content
+                new_lines.append(line)
+                i += 1
+            else:
+                new_lines.append(line)
+                i += 1
+
+        content = "\n".join(new_lines)
+
+        # Write back the cleaned content
+        try:
+            with open(filepath, "w", encoding="utf-8") as f:
+                f.write(content)
+            print(f"  Fixed duplicate headers")
+        except Exception as e:
+            print(f"  Error writing cleaned file: {e}")
+            return False
 
     # Parse existing header
     existing_header, body = parse_existing_header(content)

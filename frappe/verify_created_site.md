@@ -18,14 +18,6 @@ categories:
 - frappe
 ---
 
----
-title: Verifying Offline Frappe ERPNext and Fixing Frontend Issues
-date: 2026-01-20
-description: Complete guide for verifying and fixing offline Frappe ERPNext deployment issues
-permalink: posts/{{ title | slug }}/index.html
-tags: [frappe, erpnext, offline, docker, troubleshooting]
-categories: ['frappe']
----
 
 # 🟢 Verifying Offline Frappe/ERPNext Is Working (and Fixing Frontend Issues)
 

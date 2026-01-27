@@ -16,14 +16,6 @@ categories:
 - frappe
 ---
 
----
-title: Complete Guide Full Backup & Restore in Frappe ERPNext
-date: 2026-01-21
-description: Production-ready backup and restore strategies for Frappe and ERPNext with best practices
-permalink: posts/{{ title | slug }}/index.html
-tags: [frappe, erpnext, backup, restore, database, production]
-categories: ['frappe']
----
 
 # 📘 Complete Guide: Full Backup & Restore in Frappe / ERPNext (Production-Ready)
 
