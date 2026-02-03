@@ -48,7 +48,7 @@ bench --site [your-site] set-maintenance-mode on
 Stop background jobs to prevent conflicts:
 
 ```bash
-bench --site [your-site] scheduler disable
+bench --site [your-site] disable-scheduler
 ```
 
 #### 1.3 Check Current State
