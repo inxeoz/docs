@@ -40,7 +40,7 @@ Before restoring a Frappé database, follow this complete workflow to ensure a s
 Prevent users from accessing the site during restore:
 
 ```bash
-bench --site [your-site] set-maintenance-mode on
+bench --site [your-site] maintenance-mode on
 ```
 
 #### 1.2 Disable Scheduler
@@ -48,7 +48,7 @@ bench --site [your-site] set-maintenance-mode on
 Stop background jobs to prevent conflicts:
 
 ```bash
-bench --site [your-site] disable-scheduler
+bench --site [your-site] scheduler disable
 ```
 
 #### 1.3 Check Current State
@@ -251,6 +251,209 @@ cat sites/[your-site]/site_config.json
 # Import manually (use with caution)
 mysql -h [host] -u [db_user] -p[db_password] [db_name] < backup.sql
 ```
+
+## Restoring Public and Private Files
+
+After database restoration, you must restore the file attachments. Frappé backups typically include two file archives:
+
+- **`[timestamp]-files.tar`** - Public files (images, documents accessible via web)
+- **`[timestamp]-private-files.tar`** - Private files (attachments, restricted access)
+
+### Understanding File Structure
+
+**Public files** are stored in:
+```
+sites/[site]/public/files/
+```
+Accessible via: `http://[site]/files/[filename]`
+
+**Private files** are stored in:
+```
+sites/[site]/private/files/
+```
+Accessible via: `/private/files/[filename]` (requires authentication)
+
+### File Restoration Methods
+
+#### Method 1: Standard Extraction (Non-Docker)
+
+```bash
+cd ~/frappe-bench/sites/[your-site]
+
+# Extract public files
+tar -xf /path/to/backup-files.tar -C .
+
+# This creates: sites/[your-site]/alis.local/public/files/
+# Move to correct location:
+mv alis.local/public/files/* public/files/
+
+# Extract private files
+tar -xf /path/to/backup-private-files.tar -C .
+mv alis.local/private/files/* private/files/
+
+# Cleanup temp directory
+rm -rf alis.local/
+
+# Fix permissions
+sudo chown -R frappe:frappe public/files/
+sudo chown -R frappe:frappe private/files/
+```
+
+#### Method 2: Using /tmp for Permission Issues
+
+If you get "Permission denied" during extraction:
+
+```bash
+# Extract to /tmp first
+cd /tmp
+tar -xf /path/to/backup-files.tar
+tar -xf /path/to/backup-private-files.tar
+
+# Copy to site
+cp -r alis.local/public/files/* ~/frappe-bench/sites/[your-site]/public/files/
+cp -r alis.local/private/files/* ~/frappe-bench/sites/[your-site]/private/files/
+
+# Cleanup
+rm -rf /tmp/alis.local
+```
+
+#### Method 3: Docker/FM Container Environment
+
+For Docker-based setups:
+
+```bash
+# Copy archives into container first
+docker cp /path/to/backup-files.tar shipra-backend-1:/tmp/
+docker cp /path/to/backup-private-files.tar shipra-backend-1:/tmp/
+
+# Extract inside container
+docker exec shipra-backend-1 bash -c "
+  cd /tmp &&
+  tar -xf backup-files.tar &&
+  tar -xf backup-private-files.tar &&
+  cp -r alis.local/public/files/* /home/frappe/frappe-bench/sites/[your-site]/public/files/ &&
+  cp -r alis.local/private/files/* /home/frappe/frappe-bench/sites/[your-site]/private/files/ &&
+  chown -R frappe:frappe /home/frappe/frappe-bench/sites/[your-site]/public/files/ &&
+  chown -R frappe:frappe /home/frappe/frappe-bench/sites/[your-site]/private/files/ &&
+  rm -rf /tmp/alis.local
+"
+```
+
+### Verifying File Restoration
+
+#### Check Public Files
+
+```bash
+# List files
+ls -la ~/frappe-bench/sites/[your-site]/public/files/
+
+# Expected output:
+# alis-fav.JPG
+# alis-logo.JPG
+# vs.jpg
+# website_theme/
+```
+
+#### Check Private Files
+
+```bash
+# List files
+ls -la ~/frappe-bench/sites/[your-site]/private/files/
+
+# Expected output:
+# APISEVA ppt.pdf
+# Domain Modification Form.pdf
+# alis-logo3bdea7046e97.JPG
+# Book1.xlsx
+# etc.
+```
+
+#### Verify via Frappé Console
+
+```bash
+bench --site [your-site] console
+```
+
+```python
+# Check if files are accessible
+file_list = frappe.get_all('File', filters={'is_private': 0}, limit=5)
+print(f"Public files: {len(file_list)}")
+
+private_files = frappe.get_all('File', filters={'is_private': 1}, limit=5)
+print(f"Private files: {len(private_files)}")
+
+# Check specific file attachments
+doc = frappe.get_doc('Arms Licence Application', 'ALIS-APP-00001')
+print(f"Documents attached: {doc.documents}")
+```
+
+### Common File Restoration Issues
+
+#### Issue: "Cannot mkdir: Permission denied"
+
+**Cause:** Extracting in a restricted directory
+
+**Solution:** Extract to /tmp or the site directory itself:
+```bash
+cd ~/frappe-bench/sites/[your-site]
+tar -xf /path/to/backup.tar -C .
+```
+
+#### Issue: "File not in gzip format"
+
+**Cause:** Using `-z` flag on non-gzipped tar
+
+**Solution:** Remove the `-z` flag:
+```bash
+# Wrong:
+tar -xzf backup-files.tar  # ❌
+
+# Correct:
+tar -xf backup-files.tar   # ✅
+```
+
+#### Issue: Files extracted to wrong location
+
+**Cause:** Tar creates original site path (e.g., `alis.local/`)
+
+**Solution:** Move files after extraction:
+```bash
+mv alis.local/public/files/* sites/shipra.mp.gov.in/public/files/
+mv alis.local/private/files/* sites/shipra.mp.gov.in/private/files/
+```
+
+#### Issue: File paths broken in database
+
+**Cause:** Database stores paths like `/files/logo.jpg` but files are missing
+
+**Solution:** Ensure files are in correct location, then:
+```bash
+bench --site [your-site] clear-cache
+```
+
+### File Restoration Checklist
+
+- [ ] **Extract public files** to `sites/[site]/public/files/`
+- [ ] **Extract private files** to `sites/[site]/private/files/`
+- [ ] **Verify file count** matches backup
+- [ ] **Fix ownership** (frappe:frappe or www-data:www-data)
+- [ ] **Clear cache** to refresh file index
+- [ ] **Test file access** via Frappé UI
+- [ ] **Check attachments** load on DocType forms
+
+### Quick Commands Summary
+
+| Task | Command |
+|------|---------|
+| **Extract tar** | `tar -xf backup-files.tar` |
+| **Copy public files** | `cp -r alis.local/public/files/* sites/[site]/public/files/` |
+| **Copy private files** | `cp -r alis.local/private/files/* sites/[site]/private/files/` |
+| **Fix ownership** | `chown -R frappe:frappe sites/[site]/files/` |
+| **Verify public** | `ls sites/[site]/public/files/` |
+| **Verify private** | `ls sites/[site]/private/files/` |
+| **Clear cache** | `bench --site [site] clear-cache` |
+
+---
 
 ### Phase 5: Post-Restore Configuration
 
