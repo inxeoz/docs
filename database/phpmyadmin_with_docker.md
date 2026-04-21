@@ -175,6 +175,7 @@ docker run -d \
   --name phpmyadmin \
   -p 8080:80 \
   -e PMA_HOST=10.222.0.1 \
+  --restart unless-stopped \
   -e PMA_USER=admin \
   -e PMA_PASSWORD=admin123 \
   phpmyadmin
