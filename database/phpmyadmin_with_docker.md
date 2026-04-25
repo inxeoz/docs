@@ -147,6 +147,12 @@ Allow Docker subnet:
 ```bash
 sudo iptables -I INPUT -p tcp -s 10.222.0.0/24 --dport 3306 -j ACCEPT
 ```
+or Allow using ufw permanately
+
+```bash
+sudo ufw allow from 10.222.0.0/24 to any port 3306
+```
+
 
 ---
 
