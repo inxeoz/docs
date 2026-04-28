@@ -1,110 +1,97 @@
 
-# 🐳 Running phpMyAdmin with Docker (and fixing every common error on Linux)
 
-Running phpMyAdmin in Docker sounds trivial—until Linux networking, MySQL auth, and firewalls get involved. This guide walks from zero → working setup, including the exact errors you hit.
+# 🐳 Running phpMyAdmin with Docker on Linux (Fast + Correct Setup)
+
+Running **phpMyAdmin** with Docker on Linux isn’t hard—but most guides miss key details around networking *and performance*. This version gets you a **working + fast setup**.
 
 ---
 
 # ⚡ 1. The goal
 
-You already have:
+You have:
 
-* Local MariaDB running on your system
-* Want phpMyAdmin via Docker
-* No full LAMP stack setup
+* Local **MariaDB** running on your system
+* Want phpMyAdmin via **Docker**
+* No full LAMP stack
 
 ---
 
-# 🚀 2. Basic (but incomplete) command
-
-Most guides say:
+# 🚀 2. The correct minimal command (modern)
 
 ```bash
-docker run -d -p 8080:80 phpmyadmin
+docker run -d \
+  --name phpmyadmin \
+  -p 8080:80 \
+  --add-host=host.docker.internal:host-gateway \
+  -e PMA_HOST=host.docker.internal \
+  phpmyadmin
 ```
 
-This runs—but **won’t connect to your database**.
+👉 This is the **correct replacement** for using raw bridge IPs like `10.x.x.x`.
 
 ---
 
-# ❌ 3. Common errors you’ll hit
+# 🧠 3. Key concept (this changed everything)
 
-### 1. ❌ `host.docker.internal` not working
+Old approach:
 
 ```
-php_network_getaddresses: getaddrinfo failed
+Container → docker0 IP → host → DB
 ```
 
-👉 Linux doesn’t support it by default.
+New (correct) approach:
+
+```
+Container → host.docker.internal → DB
+```
+
+👉 Cleaner, more stable, less latency.
 
 ---
 
-### 2. ❌ Endless loading after login
+# ❌ 4. Common errors (and real causes)
 
-* No error
-* Just spins forever
-
-👉 This is **network timeout to MySQL**
-
----
-
-### 3. ❌ Using wrong DB host
+### 1. `host.docker.internal` not working
 
 ```
-getaddrinfo for fm_global-db failed
+getaddrinfo failed
 ```
 
-👉 Happens if you accidentally point to another container
-
----
-
-### 4. ❌ Connection hangs (no response)
-
-Even `nc` test hangs:
+👉 Fix: add
 
 ```bash
-nc -zv 10.222.0.1 3306
-```
-
-👉 This means **firewall is blocking Docker → host**
-
----
-
-# 🧠 4. Key concept (this unlocks everything)
-
-On Linux:
-
-| Thing            | Meaning                 |
-| ---------------- | ----------------------- |
-| Docker container | separate network        |
-| Host machine     | reachable via bridge IP |
-| Docker bridge    | usually `docker0`       |
-
-👉 Your host is accessible as something like:
-
-```
-10.222.0.1
+--add-host=host.docker.internal:host-gateway
 ```
 
 ---
 
-# 🔍 5. Find your host IP from Docker
+### 2. Infinite loading / slow UI
 
-```bash
-ip addr show docker0
-```
+👉 Not networking anymore—it’s usually:
 
-Example:
-
-```text
-inet 10.222.0.1/24
-```
-
-👉 That’s your **real target for MySQL**
+* DNS lookup delay in MariaDB
+* low buffer pool
+* PHP overhead
 
 ---
 
-# 🔓 6. Fix MariaDB (critical)
+### 3. Wrong DB host
+
+```
+getaddrinfo failed
+```
+
+👉 Happens when pointing to unrelated containers (e.g., frappe DB)
+
+---
+
+### 4. Connection hang
+
+👉 Usually firewall—but less common if using `host.docker.internal`
+
+---
+
+# 🔓 5. MariaDB must be reachable
 
 Edit config:
 
@@ -112,9 +99,10 @@ Edit config:
 sudo nano /etc/my.cnf
 ```
 
-Change:
+Ensure:
 
 ```ini
+[mariadb]
 bind-address = 0.0.0.0
 ```
 
@@ -126,11 +114,7 @@ sudo systemctl restart mariadb
 
 ---
 
-## 👤 Allow remote user
-
-```bash
-mariadb -u root -p
-```
+## 👤 Allow access
 
 ```sql
 CREATE USER 'admin'@'%' IDENTIFIED BY 'admin123';
@@ -140,33 +124,65 @@ FLUSH PRIVILEGES;
 
 ---
 
-# 🔥 7. Fix firewall (THE hidden issue)
+# ⚡ 6. **Critical performance fix (MOST IMPORTANT)**
 
-Allow Docker subnet:
+Without this, phpMyAdmin feels slow even if everything “works”.
 
-```bash
-sudo iptables -I INPUT -p tcp -s 10.222.0.0/24 --dport 3306 -j ACCEPT
-```
-or Allow using ufw permanately
+Edit:
 
 ```bash
-sudo ufw allow from 10.222.0.0/24 to any port 3306
+sudo nano /etc/my.cnf
 ```
 
+Add:
+
+```ini
+[mysqld]
+skip-name-resolve
+innodb_buffer_pool_size=512M
+innodb_log_file_size=128M
+```
+
+Restart:
+
+```bash
+sudo systemctl restart mariadb
+```
 
 ---
 
-## 🧪 Test connection (important)
+## 🧠 Why this matters
 
-Inside container:
+| Problem      | Effect               |
+| ------------ | -------------------- |
+| DNS lookup   | delay on every query |
+| small buffer | disk reads (slow)    |
+
+👉 These cause the “laggy clicks” feeling.
+
+---
+
+# 🔥 7. Firewall (only if needed)
+
+If connection fails:
+
+```bash
+sudo ufw allow from 172.17.0.0/16 to any port 3306
+```
+
+👉 Docker default subnet
+
+---
+
+# 🧪 8. Test connection
 
 ```bash
 docker exec -it phpmyadmin bash
-apt install -y netcat-openbsd
-nc -zv 10.222.0.1 3306
+apt update && apt install -y netcat-openbsd
+nc -zv host.docker.internal 3306
 ```
 
-✅ You want:
+✅ Expect:
 
 ```
 succeeded
@@ -174,52 +190,50 @@ succeeded
 
 ---
 
-# 🚀 8. Final working command
-
-```bash
-docker run -d \
-  --name phpmyadmin \
-  -p 8080:80 \
-  -e PMA_HOST=10.222.0.1 \
-  --restart unless-stopped \
-  -e PMA_USER=admin \
-  -e PMA_PASSWORD=admin123 \
-  phpmyadmin
-```
-
----
-
-# 🌍 9. Access phpMyAdmin
+# 🌍 9. Access
 
 ```
 http://localhost:8080
 ```
 
-👉 You should be logged in instantly.
+---
+
+# ⚡ 10. Make phpMyAdmin faster (optional but recommended)
+
+```bash
+docker run -d \
+  --name phpmyadmin \
+  -p 8080:80 \
+  --add-host=host.docker.internal:host-gateway \
+  -e PMA_HOST=host.docker.internal \
+  -e PHP_OPCACHE_ENABLE=1 \
+  phpmyadmin
+```
+
+👉 Enables PHP caching → faster UI
 
 ---
 
-# 🧠 10. Why it failed earlier
+# 🧠 11. Why it was slow before
 
-| Problem                    | Cause                         |
-| -------------------------- | ----------------------------- |
-| Infinite loading           | DB not reachable              |
-| host.docker.internal error | not supported on Linux        |
-| Wrong container DB         | confusion with other services |
-| Connection hang            | firewall blocking             |
-| Login loop                 | MySQL auth mismatch           |
+| Issue        | Cause                                     |
+| ------------ | ----------------------------------------- |
+| Laggy clicks | DNS lookups (`skip-name-resolve` missing) |
+| Slow queries | tiny buffer pool                          |
+| Random delay | indirect IP routing                       |
+| UI sluggish  | PHP recompiling                           |
 
 ---
 
-# ⚠️ 11. Security notes (don’t skip)
+# ⚠️ 12. Security notes
 
 * Don’t expose port 3306 publicly
-* Prefer non-root user (`admin`)
-* Restrict firewall to Docker subnet only
+* Use non-root user
+* Restrict firewall to Docker subnet
 
 ---
 
-# 🧩 12. Optional: cleaner setup (docker-compose)
+# 🧩 13. Optional docker-compose
 
 ```yaml
 version: '3'
@@ -228,26 +242,22 @@ services:
     image: phpmyadmin
     ports:
       - 8080:80
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
-      PMA_HOST: 10.222.0.1
+      PMA_HOST: host.docker.internal
       PMA_USER: admin
       PMA_PASSWORD: admin123
-```
-
-Run:
-
-```bash
-docker compose up -d
 ```
 
 ---
 
 # 🎯 Final takeaway
 
-On Linux, the real trick is:
+On Linux, the real solution is:
 
-👉 **Container → Host = Docker bridge IP (NOT localhost)**
-👉 **Firewall must allow that path**
+👉 Use `host.docker.internal` (not raw IPs)
+👉 Disable DNS lookups in MariaDB
+👉 Increase buffer pool
 
-Everything else is noise.
-
+Everything else is secondary.
