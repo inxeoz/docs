@@ -209,7 +209,7 @@ docker run -d \
   -e PHP_OPCACHE_ENABLE=1 \
   phpmyadmin
 ```
-
+use ``--restart always`` for automatic start at boot
 👉 Enables PHP caching → faster UI
 
 ---
