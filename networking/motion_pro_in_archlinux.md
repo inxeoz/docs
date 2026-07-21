@@ -212,6 +212,12 @@ With all of the above addressed, MotionPro should connect and establish the L3VP
 
 Script
 
+```
+chmod +x start-motion-pro-gui.sh
+./start-motion-pro-gui.sh
+```
+
+----
 
 ```bash
 
