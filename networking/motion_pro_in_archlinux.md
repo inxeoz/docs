@@ -204,3 +204,132 @@ Then retry connecting in MotionPro.
 - [ ] (Optional) systemd unit created for `vpnd` so it survives reboots
 
 With all of the above addressed, MotionPro should connect and establish the L3VPN tunnel successfully on Arch Linux.
+
+
+
+-----------------------
+
+
+Script
+
+
+```bash
+
+#!/usr/bin/env bash
+#
+# start-motion-pro-gui.sh
+#
+# Sets up prerequisites and launches the MotionPro (Array Networks SSL VPN)
+# GUI client on Arch Linux, working around the common issues seen when the
+# client was installed from the vendor's Ubuntu installer or AUR:
+#   - vpnd not running, or running unprivileged
+#   - tun kernel module not loaded
+#   - Qt platform plugin failing under Wayland
+#   - a conflicting VPN/tunnel client (e.g. Cloudflare WARP) already active
+#
+# Usage:
+#   ./start-motion-pro-gui.sh
+#
+# You will be prompted for your sudo password if privileged setup is needed.
+
+set -uo pipefail
+
+MOTIONPRO_BIN="${MOTIONPRO_BIN:-$(command -v MotionPro || echo /usr/bin/MotionPro)}"
+VPND_BIN="${VPND_BIN:-$(command -v vpnd || echo /usr/bin/vpnd)}"
+
+log()  { printf '\033[1;34m[*]\033[0m %s\n' "$1"; }
+ok()   { printf '\033[1;32m[ok]\033[0m %s\n' "$1"; }
+warn() { printf '\033[1;33m[!]\033[0m %s\n' "$1"; }
+err()  { printf '\033[1;31m[x]\033[0m %s\n' "$1"; }
+
+# ---------------------------------------------------------------------------
+# 1. Sanity checks
+# ---------------------------------------------------------------------------
+if [[ ! -x "$MOTIONPRO_BIN" ]]; then
+    err "MotionPro binary not found (looked for: $MOTIONPRO_BIN)."
+    err "Install it first, e.g.: yay -S motionpro motionpro-gui"
+    exit 1
+fi
+
+if [[ ! -x "$VPND_BIN" ]]; then
+    err "vpnd binary not found (looked for: $VPND_BIN)."
+    err "Install it first, e.g.: yay -S motionpro"
+    exit 1
+fi
+
+# ---------------------------------------------------------------------------
+# 2. Ensure the tun kernel module and device are available
+# ---------------------------------------------------------------------------
+log "Checking tun kernel module..."
+if ! lsmod | grep -q '^tun'; then
+    warn "tun module not loaded, loading now..."
+    sudo modprobe tun || { err "Failed to load tun module."; exit 1; }
+fi
+ok "tun module is loaded."
+
+if [[ ! -e /dev/net/tun ]]; then
+    err "/dev/net/tun does not exist. Something is wrong with your kernel/tun setup."
+    exit 1
+fi
+ok "/dev/net/tun is present."
+
+# ---------------------------------------------------------------------------
+# 3. Ensure vpnd is running as root
+# ---------------------------------------------------------------------------
+log "Checking vpnd daemon status..."
+
+vpnd_pid_line="$(ps -eo pid,uid,comm | awk '$3 == "vpnd" {print}' | head -n1)"
+
+if [[ -z "$vpnd_pid_line" ]]; then
+    warn "vpnd is not running. Starting it as root..."
+    sudo "$VPND_BIN" &
+    disown
+    sleep 1
+else
+    vpnd_uid="$(awk '{print $2}' <<< "$vpnd_pid_line")"
+    if [[ "$vpnd_uid" != "0" ]]; then
+        warn "vpnd is running as UID $vpnd_uid instead of root. Restarting it as root..."
+        sudo pkill vpnd
+        sleep 1
+        sudo "$VPND_BIN" &
+        disown
+        sleep 1
+    else
+        ok "vpnd is already running as root."
+    fi
+fi
+
+# Re-check after (re)start
+vpnd_pid_line="$(ps -eo pid,uid,comm | awk '$3 == "vpnd" {print}' | head -n1)"
+if [[ -z "$vpnd_pid_line" ]]; then
+    err "vpnd still isn't running after attempting to start it. Aborting."
+    exit 1
+fi
+ok "vpnd confirmed running (pid $(awk '{print $1}' <<< "$vpnd_pid_line"))."
+
+# ---------------------------------------------------------------------------
+# 4. Warn about conflicting VPN/tunnel clients
+# ---------------------------------------------------------------------------
+log "Checking for conflicting VPN/tunnel software..."
+
+if command -v warp-cli &>/dev/null; then
+    warp_status="$(warp-cli status 2>/dev/null | head -n1)"
+    if [[ "$warp_status" == *"Connected"* ]]; then
+        warn "Cloudflare WARP is currently connected — this commonly conflicts with MotionPro's tunnel setup."
+        read -r -p "    Disconnect it now? [Y/n] " reply
+        if [[ -z "$reply" || "$reply" =~ ^[Yy]$ ]]; then
+            warp-cli disconnect
+            ok "WARP disconnected."
+        else
+            warn "Leaving WARP connected — MotionPro may fail with 'fails to configure the L3VPN tunnel'."
+        fi
+    fi
+fi
+
+# ---------------------------------------------------------------------------
+# 5. Launch the GUI with the correct Qt platform plugin
+# ---------------------------------------------------------------------------
+log "Launching MotionPro GUI..."
+QT_QPA_PLATFORM=xcb "$MOTIONPRO_BIN" "$@"
+
+```
