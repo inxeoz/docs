@@ -220,7 +220,6 @@ chmod +x start-motion-pro-gui.sh
 ----
 
 ```bash
-
 #!/usr/bin/env bash
 #
 # start-motion-pro-gui.sh
@@ -240,7 +239,9 @@ chmod +x start-motion-pro-gui.sh
 
 set -uo pipefail
 
-MOTIONPRO_BIN="${MOTIONPRO_BIN:-$(command -v MotionPro || echo /usr/bin/MotionPro)}"
+# MOTIONPRO_BIN="${MOTIONPRO_BIN:-$(command -v MotionPro || echo /usr/bin/MotionPro)}"
+
+MOTIONPRO_BIN="${MOTIONPRO_BIN:-/opt/MotionPro/MotionPro}"
 VPND_BIN="${VPND_BIN:-$(command -v vpnd || echo /usr/bin/vpnd)}"
 
 log()  { printf '\033[1;34m[*]\033[0m %s\n' "$1"; }
@@ -332,10 +333,24 @@ if command -v warp-cli &>/dev/null; then
     fi
 fi
 
+
 # ---------------------------------------------------------------------------
-# 5. Launch the GUI with the correct Qt platform plugin
+# 5. Launch the GUI
 # ---------------------------------------------------------------------------
 log "Launching MotionPro GUI..."
-QT_QPA_PLATFORM=xcb "$MOTIONPRO_BIN" "$@"
+
+# Point strictly to the directory containing libvl3vpn.so
+export LD_LIBRARY_PATH="/opt/MotionPro:${LD_LIBRARY_PATH:-}"
+
+# Force Arch system C++ runtime & allocation
+export LD_PRELOAD="/usr/lib/libstdc++.so.6"
+
+# Force Qt to run via XCB (Xwayland / X11)
+export QT_QPA_PLATFORM="xcb"
+
+# Prevent Qt from trying to load bundled plugins
+unset QT_PLUGIN_PATH
+
+"$MOTIONPRO_BIN" "$@"
 
 ```
