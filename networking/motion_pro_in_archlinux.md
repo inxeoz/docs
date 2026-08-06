@@ -331,3 +331,38 @@ unset QT_PLUGIN_PATH
 "$MOTIONPRO_BIN" "$@"
 
 ```
+
+
+fix routing for ip
+
+``fixroute.sh``
+
+----
+
+```bash
+
+#!/usr/bin/env bash
+
+# Takes an IP passed to the script, or defaults to 172.18.210.49
+TARGET="${1:-172.18.210.49}"
+
+# Dynamically extract active tun0 IP
+TUN_IP=$(ip -4 addr show dev tun0 2>/dev/null | awk '/inet / {print $2}' | cut -d/ -f1)
+
+if [[ -z "$TUN_IP" ]]; then
+    echo "[!] tun0 interface not found or has no IP. Is MotionPro connected?"
+    exit 1
+fi
+
+echo "[*] Directing ${TARGET} via tun0 (src ${TUN_IP})..."
+
+# Apply /32 route and priority 100 policy rule
+sudo ip route replace "${TARGET}/32" dev tun0 src "${TUN_IP}"
+sudo ip rule add to "${TARGET}/32" lookup main priority 100 2>/dev/null || true
+sudo ip route flush cache
+
+echo "[ok] Route applied! Testing lookup:"
+ip route get "${TARGET}"
+
+
+```
