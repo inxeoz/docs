@@ -225,12 +225,11 @@ chmod +x start-motion-pro-gui.sh
 # start-motion-pro-gui.sh
 #
 # Sets up prerequisites and launches the MotionPro (Array Networks SSL VPN)
-# GUI client on Arch Linux, working around the common issues seen when the
+# GUI client on Arch Linux, working around common issues seen when the
 # client was installed from the vendor's Ubuntu installer or AUR:
 #   - vpnd not running, or running unprivileged
 #   - tun kernel module not loaded
 #   - Qt platform plugin failing under Wayland
-#   - a conflicting VPN/tunnel client (e.g. Cloudflare WARP) already active
 #
 # Usage:
 #   ./start-motion-pro-gui.sh
@@ -238,8 +237,6 @@ chmod +x start-motion-pro-gui.sh
 # You will be prompted for your sudo password if privileged setup is needed.
 
 set -uo pipefail
-
-# MOTIONPRO_BIN="${MOTIONPRO_BIN:-$(command -v MotionPro || echo /usr/bin/MotionPro)}"
 
 MOTIONPRO_BIN="${MOTIONPRO_BIN:-/opt/MotionPro/MotionPro}"
 VPND_BIN="${VPND_BIN:-$(command -v vpnd || echo /usr/bin/vpnd)}"
@@ -315,27 +312,7 @@ fi
 ok "vpnd confirmed running (pid $(awk '{print $1}' <<< "$vpnd_pid_line"))."
 
 # ---------------------------------------------------------------------------
-# 4. Warn about conflicting VPN/tunnel clients
-# ---------------------------------------------------------------------------
-log "Checking for conflicting VPN/tunnel software..."
-
-if command -v warp-cli &>/dev/null; then
-    warp_status="$(warp-cli status 2>/dev/null | head -n1)"
-    if [[ "$warp_status" == *"Connected"* ]]; then
-        warn "Cloudflare WARP is currently connected — this commonly conflicts with MotionPro's tunnel setup."
-        read -r -p "    Disconnect it now? [Y/n] " reply
-        if [[ -z "$reply" || "$reply" =~ ^[Yy]$ ]]; then
-            warp-cli disconnect
-            ok "WARP disconnected."
-        else
-            warn "Leaving WARP connected — MotionPro may fail with 'fails to configure the L3VPN tunnel'."
-        fi
-    fi
-fi
-
-
-# ---------------------------------------------------------------------------
-# 5. Launch the GUI
+# 4. Launch the GUI
 # ---------------------------------------------------------------------------
 log "Launching MotionPro GUI..."
 
