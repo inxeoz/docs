@@ -115,7 +115,7 @@ launch=xdg-open ${url}
 
 ```
 
-simplest script that handles no protocol
+simplest script that handles without protocol
 
 
 
