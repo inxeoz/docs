@@ -102,3 +102,15 @@ regex=((https?://)?(([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}
 ---
 
 That's it! Now you can open URLs in Foot terminal like a pro.
+
+-------
+
+simplest
+
+```ini
+[url]
+# Matches: https://example.com, example.com, localhost:4200, 127.0.0.1:8080
+regex=((https?://)?(([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}|localhost|([0-9]{1,3}\.){3}[0-9]{1,3})(:[0-9]{1,5})?(/[a-zA-Z0-9./?=&_~#%+-]*)?)
+launch=xdg-open ${url}
+
+```
