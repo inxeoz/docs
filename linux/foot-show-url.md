@@ -114,3 +114,44 @@ regex=((https?://)?(([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}
 launch=xdg-open ${url}
 
 ```
+
+simplest script that handles no protocol
+
+
+
+```bash
+
+#!/usr/bin/env bash
+
+# Just add http:// if no protocol
+url="$1"
+
+# If no protocol, add http:// (handles www too)
+if [[ ! "$url" =~ ^https?:// ]] && [[ ! "$url" =~ ^[a-zA-Z]+:// ]]; then
+    url="http://$url"
+fi
+
+xdg-open "$url"
+
+```
+
+then 
+
+```bash
+chmod +x ~/.local/bin/url-open.sh
+```
+
+
+then 
+
+foot config
+
+```ini
+
+[url]
+launch=/home/inxeoz/.local/bin/url-open.sh ${url}
+regex=((https?://)?(([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}|localhost|([0-9]{1,3}\.){3}[0-9]{1,3})(:[0-9]{1,5})?(/[^\s<>"']*)?)
+
+```
+
+
