@@ -1,0 +1,26 @@
+login 
+```bash
+gh auth refresh -s admin:org,repo
+```
+
+disable
+
+
+
+```bash
+  
+# Add both your personal username and organization name here
+TARGET_OWNERS=("inxeoz" "inxeoz-org", "inxeoz-archive", "inxeoz-garage")
+
+for owner in "${TARGET_OWNERS[@]}"; do
+  echo "--- Scanning repositories for owner: $owner ---"
+  
+  # Fetch repositories strictly owned by this specific target
+  repos=$(env MISE_QUIET=1 gh repo list "$owner" --json name -q '.[].name' 2>/dev/null)
+  
+  for repo in $repos; do
+    echo "Disabling actions for $owner/$repo..."
+    echo '{"enabled": false}' | gh api -X PUT "/repos/$owner/$repo/actions/permissions" --input -
+  done
+done
+```
