@@ -1,0 +1,110 @@
+title = "Inxeoz Docs"
+theme = "spaceboy"  # redesigned 2026-06-05 — 19-palette system from herdr.dev
+
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+  page = ["HTML", "markdown"]
+
+# ── Raw Markdown Format ──────────────────────────────────────────────
+# Every regular page is also published as its raw markdown source at the
+# page URL followed by ".md", e.g. /posts/tech/bitwise-green-red-flags/.md
+# Rendered by the theme template layouts/_default/single.markdown.md.
+[outputFormats.markdown]
+  baseName = ""
+
+[markup]
+  [markup.goldmark.renderer]
+    unsafe = true
+  [markup.goldmark.extensions.passthrough]
+    enable = true
+    [markup.goldmark.extensions.passthrough.delimiters]
+      block = [["$$", "$$"], ["\\[", "\\]"]]
+      inline = [["$", "$"], ["\\(", "\\)"]]
+  [markup.highlight]
+    style = "tokyonight-moon"
+    noClasses = false
+  [markup.tableOfContents]
+    endLevel = 2
+    startLevel = 1
+    ordered = false
+
+
+[params]
+  # Site metadata
+  mainSections = ["posts"]
+  # Thumbnails: global default (per-file can override with showThumbnailInList/Catalog)
+  showThumbnailInList = true
+  showThumbnailInCatalog = true
+  # Required: Author info (displayed in posts)
+  enableCopyCode = true
+  lazyImage = true
+  favicon = "https://cdn.jsdelivr.net/gh/inxeoz/i4z/icons/0466c8.png"
+[params.author]
+  name = "inxeoz"
+
+  # Main content sections
+
+  # KaTeX configuration (for mathematical notation)
+  # katexCSSCDN = "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+  # katexJSCDN = "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
+  # katexAutoRenderJSCDN = "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+
+  # Mermaid diagrams are pre-rendered at build time via scripts/render-mermaid-cache.mjs
+
+  # HR style: "small" (4em centered, default), "full" (full width), or any CSS length e.g. "40%"
+  hrStyle = "full"
+
+  # ── Typography ──────────────────────────────────────────────────────────
+  # font = "mono"              # "mono" (default) | "serif" | "sans" | CSS font-family string
+  # dropCap = false            # Enlarged first letter — stories, novels
+  # justify = false            # Justify paragraph text — essays, formal documents
+  # numberedHeadings = false   # Auto-number h2/h3/h4 — docs, research papers
+
+  # ── Layout ──────────────────────────────────────────────────────────────
+  # contentWidth = "normal"   # "narrow" (65ch) | "normal" | "wide" (1200px) | "full"
+  # imageFullBleed = false    # Stretch images to viewport width (best with contentWidth: full)
+  # coverImage = ""           # URL of hero image shown at top of post (also used as og:image)
+  # codeMaxHeight = "32rem"   # Max-height of code blocks; "none" to remove limit
+
+  # ── Post Meta ───────────────────────────────────────────────────────────
+  # progressBar = false        # Reading progress bar at top of page
+  # showReadingTime = false    # Show "X min read" in post meta
+  # showLastModified = false   # Show last-modified date (when different from publish date)
+  # noMeta = false             # Hide date/author/reading-time meta block entirely
+
+  # ── Per-post only (front matter) ────────────────────────────────────────
+  # abstract = "..."          # Styled abstract block — research papers
+  # epigraph = "..."          # Opening literary quote — novels, essays
+  # hrStyle = "small"         # "small" | "full" | CSS length — scene/section breaks
+
+  # TOC configuration
+  tocTitle = "Contents"
+  tocSubTitle = "In this section"
+
+  # Navigation menu
+  [[params.nav]]
+    name = "Home"
+    link = "/"
+  [[params.nav]]
+    name = "About"
+    link = "/about"
+
+
+# KaTeX delimiters configuration (IMPORTANT: Place outside [params] section at root level)
+# Customize which delimiters trigger math rendering - uncomment to modify
+[[params.katexDelimiters]]
+  left = "$$"
+  right = "$$"
+  display = true
+[[params.katexDelimiters]]
+  left = "$"
+  right = "$"
+  display = false
+[[params.katexDelimiters]]
+  left = "\\("
+  right = "\\)"
+  display = false
+[[params.katexDelimiters]]
+  left = "\\["
+  right = "\\]"
+  display = true

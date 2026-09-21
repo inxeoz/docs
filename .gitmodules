@@ -1,0 +1,3 @@
+[submodule "themes/spaceboy"]
+	path = themes/spaceboy
+	url = git@github.com:inxeoz/spaceboy.git

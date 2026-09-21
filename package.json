@@ -1,0 +1,11 @@
+{
+  "name": "inxeoz-diary",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "npm --prefix themes/spaceboy install",
+    "dev": "npm run setup && node themes/spaceboy/scripts/render-mermaid-cache.mjs && node themes/spaceboy/scripts/render-katex-cache.mjs && hugo server",
+    "build:diagrams": "npm run setup && node themes/spaceboy/scripts/render-mermaid-cache.mjs && node themes/spaceboy/scripts/render-katex-cache.mjs",
+    "build": "npm run setup && node themes/spaceboy/scripts/render-mermaid-cache.mjs && node themes/spaceboy/scripts/render-katex-cache.mjs && hugo --minify"
+  }
+}
