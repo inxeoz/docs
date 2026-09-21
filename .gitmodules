@@ -1,3 +1,6 @@
 [submodule "themes/spaceboy"]
 	path = themes/spaceboy
 	url = git@github.com:inxeoz/spaceboy.git
+[submodule "content"]
+	path = content
+	url = git@github.com:inxeoz/source.git
