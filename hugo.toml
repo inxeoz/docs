@@ -31,7 +31,7 @@ theme = "spaceboy"  # redesigned 2026-06-05 — 19-palette system from herdr.dev
 
 [params]
   # Site metadata
-  mainSections = ["android", "database", "docker", "frappe", "git", "linux", "networking", "posts", "python", "react-native", "redis_in_arch", "remote", "rhel", "virtualization"]
+  mainSections = ["ai", "android", "database", "docker", "frappe", "git", "hugo", "linux", "math", "networking", "posts", "programming", "python", "react-native", "redis_in_arch", "remote", "rhel", "testing", "verification", "virtualization", "web"]
   # Thumbnails: global default (per-file can override with showThumbnailInList/Catalog)
   showThumbnailInList = true
   showThumbnailInCatalog = true
