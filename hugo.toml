@@ -39,6 +39,8 @@ theme = "spaceboy"  # redesigned 2026-06-05 — 19-palette system from herdr.dev
   enableCopyCode = true
   lazyImage = true
   favicon = "https://cdn.jsdelivr.net/gh/inxeoz/i4z/icons/0466c8.png"
+  defaultPaletteDark = "Nord"
+  defaultPaletteLight = "90s"
 [params.author]
   name = "inxeoz"
 
